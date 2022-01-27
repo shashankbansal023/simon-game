@@ -1,82 +1,77 @@
 
-//simon game;
+const boxes = document.querySelectorAll(".box");
 
-let computerArray = [];
-let userArray = [];   
-let isComputerTurn = true;
+let boxesClickedByComputer = [];
+let boxesClickedByUser = [];
 
-const boxes = ["green","red","orange","blue"];
-// const boxes_audio = [""];
-
-let score = document.getElementsByClassName('score-count')[0];
-let restart = document.getElementsByClassName('restart')[0];
-let startHead = document.getElementsByClassName('start')[0];
-score.innerHTML = 0;
+document.getElementsByClassName('score-count')[0] = 0;
+let restartButton = document.getElementsByClassName('restart')[0];
 
 
+function displayRandomColor(){
 
-const start=()=>{
-
-        restart.classList.add('display-none');
-        startHead.innerHTML = "Watch";
-      
-        let box_ele = boxes[Math.floor(4 * Math.random())];
-        computerArray.push(box_ele);
-
-        for(var i = 0;i < computerArray.length;i++){
-            let element = document.getElementsByClassName(computerArray[i])[0];
-            element.classList.remove('opacity');
-            
-            setTimeout(()=>{
-                element.classList.add('opacity');
-            },500)        
-        }
-
-        isComputerTurn = false;
-        setTimeout(()=>{
-            startHead.innerHTML = "Play";
-        },2000);
+    restartButton.classList.add('display-none');
+    document.getElementsByClassName('start')[0].innerHTML = "Watch";
+    const randomBox = Math.floor(4*Math.random());
+    boxes[randomBox].classList.remove('opacity');
+    setTimeout(()=>{
+        boxes[randomBox].classList.add('opacity');
+        document.getElementsByClassName('start')[0].innerHTML = "Play";
+    },250);
+    boxesClickedByComputer.push(boxes[randomBox]);
+    
 }
 
-
-
-boxes.forEach(item=>{
-    let element = document.getElementsByClassName(item)[0];
-
-    element.addEventListener('click', function(){
-
-        debugger;
-        if(isComputerTurn){
-            return;
-        }
-            
-        userArray.push(item);
-        element.classList.remove('opacity');
-        
-        setTimeout(()=>{
-                element.classList.add('opacity');
-        },1000);
-
-        if(!(userArray[userArray.length - 1] === computerArray[userArray.length - 1])){
-            document.getElementsByClassName('start')[0].innerHTML = "Game Over";
-            score.innerHTML = 0;
-            computerArray = [];
-            userArray = [];
-            restart.classList.remove('display-none');
-        }
-        else if(userArray.length === computerArray.length){
-            setTimeout(()=>{
-                isComputerTurn = true;
-                start();
-            },1000);
-            score.innerHTML++;
-            userArray = [];
-        }
+function startListeningForClicksOnBoxes(){
+    boxes.forEach(box=>{
+        box.addEventListener('click',onBoxClick);
     })
-})
+}
 
+function onBoxClick(event){
+    const box = document.getElementById(event.target.id);
+    boxesClickedByUser.push(box);
+    displayFadeInFadeOutBox(box);
+    checkBoxesByUserAndComputer(boxesClickedByUser,boxesClickedByComputer);
+}
 
-restart.addEventListener('click',start);
-start();
+function displayFadeInFadeOutBox(box){
+    box.classList.remove('opacity');
+    setTimeout(()=>{
+        box.classList.add('opacity');
+    },150);
+
+}
+
+function checkBoxesByUserAndComputer(userBoxes,computerBoxes){
+    
+    if(userBoxes[userBoxes.length-1] !== computerBoxes[userBoxes.length -1]){
+        document.getElementsByClassName('start')[0].innerHTML = "Game Over";
+        boxes.forEach(box=>{
+            box.removeEventListener('click',onBoxClick);
+        })
+       
+        restartButton.classList.remove('display-none');
+    }
+    else if(userBoxes.length === computerBoxes.length){
+        boxesClickedByUser = [];
+        setTimeout(displayRandomColor,500);
+        document.getElementsByClassName('score-count')[0].innerHTML++;
+    }    
+}
+
+restartButton.addEventListener('click',restartGame);
+
+function restartGame(){
+    boxesClickedByComputer = [];
+    boxesClickedByUser = [];
+    displayRandomColor();
+    startListeningForClicksOnBoxes();
+    document.getElementsByClassName('score-count')[0].innerHTML = 0;
+}
+
+startListeningForClicksOnBoxes();
+displayRandomColor();
+
 
 

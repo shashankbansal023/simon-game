@@ -60,9 +60,17 @@
 }
 
 .opacity{
-    opacity: 0.5;
+    opacity: 0.3;
 }
 
 .display-none{
     display:none;
+}
+
+.restart{
+    padding: 10px;
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    border-radius: 2px;
 }
